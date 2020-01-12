@@ -1,7 +1,7 @@
 // Name: Nathan Olah 
-// Seneca Student ID:
-// Seneca email:
-// Date of completion:
+// Seneca Student ID: 124723198
+// Seneca email: nolah@myseneca.ca
+// Date of completion: 2020/01/12
 //
 // I confirm that the content of this file is created by me,
 //   with the exception of the parts provided to me by my professor.
@@ -34,9 +34,8 @@ std::cout << "Command Line:\n";
 // 1: first argument
 // 2: second argument
 // 3: third argument
-for (int i = 0; i < argc; i++) {
+for (int i = 0; i < argc; i++)
 	std::cout << i + 1 << ": " << argv[i] << std::endl;
-}
 
 std::cout << std::endl;
 
