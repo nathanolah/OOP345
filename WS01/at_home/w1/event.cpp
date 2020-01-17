@@ -51,7 +51,7 @@ namespace sdds {
       static unsigned counter{ 0u }; // Static counter to keep track of iterations 
 
       counter++;
-      if (!m_desc || strcmp(m_desc, "") == 0) {
+      if (!m_desc || strcmp(m_desc, "") == 0) { 
          // Displays counter with no description available
          std::cout
             << std::setw(3) << std::setfill(' ')
@@ -77,12 +77,22 @@ namespace sdds {
          allocateAndCopy(cString); // Dynamically set description
          setTime(); // Sets time of the description 
       }
+      else if (!cString) { 
+         setEmpty(); 
+         allocateAndCopy(cString);
+      }
    }
 
    // Allocate and copy parameter into "m_desc"
    void Event::allocateAndCopy(const char* cString) {
-      m_desc = new char[strlen(cString) + 1];
-      strcpy(m_desc, cString);
+      if (cString) { 
+         m_desc = new char[strlen(cString) + 1];
+         strcpy(m_desc, cString);
+      }
+      else if (!cString) { 
+         m_desc = new char[1];
+         m_desc[0] = 0;
+      }
    }
 
    // Sets time for seconds, minutes, and hours
