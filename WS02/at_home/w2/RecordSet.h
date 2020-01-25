@@ -18,10 +18,10 @@ namespace sdds {
       RecordSet();
       RecordSet(const char* filename);
       RecordSet(const RecordSet& ro);
-      RecordSet(const RecordSet&& ro);
+      RecordSet(RecordSet&& ro);
       ~RecordSet();
       RecordSet& operator=(const RecordSet& ro);
-      RecordSet& operator=(const RecordSet&& ro);
+      RecordSet& operator=(RecordSet&& ro);
       size_t size()const;
       std::string getRecord(size_t index)const;
       void allocateAndCopy(const RecordSet& ro);

@@ -19,7 +19,7 @@ namespace sdds {
 
    // One argument constructor 
    RecordSet::RecordSet(const char* filename) {
-      size_t lineCount = 0u;
+      size_t index{ 0u };
       std::string line;
 
       // Opens file
@@ -29,15 +29,13 @@ namespace sdds {
          // Checks if not end of file and state of stream is good
          while (!file.eof() && file.good()) {
             getline(file, line, ' ');
-            lineCount++; // Counts the amount of lines
+            m_numberOfStrings++; // Counts amount of strings
             //file.clear();
          }
-         m_numberOfStrings = lineCount;
-
+         
          // Checks if the end of the file 
          if (file.eof()) {
             file.clear();
-
             // Sets the position of the next character to be extracted from the input stream
             file.seekg(0, file.beg); // beginning of the stream
          }
@@ -45,7 +43,7 @@ namespace sdds {
          // Allocate number of strings for string array
          m_pStrings = new std::string[m_numberOfStrings];
 
-         size_t index = 0;
+         //size_t index = 0;
          while (!file.eof() && file.good()) {
             // Get each line from file into each element of "m_pStrings"
             getline(file, m_pStrings[index], ' ');
@@ -56,41 +54,35 @@ namespace sdds {
    }
 
    // Copy constructor
-   RecordSet::RecordSet(const RecordSet& ro) {
-      m_numberOfStrings = ro.m_numberOfStrings;
+   RecordSet::RecordSet(const RecordSet& ro) { 
       allocateAndCopy(ro);
    }
 
    // Copy assignment operator
    RecordSet& RecordSet::operator=(const RecordSet& ro) {
       if (this != &ro) {
-         m_numberOfStrings = ro.m_numberOfStrings;
          // Deallocate the current resource
          delete[] m_pStrings;
+         m_pStrings = nullptr;
          // Allocate for the newest resource
          allocateAndCopy(ro);
       }
       return *this;
    }
 
-   // Move constructor
-   RecordSet::RecordSet(const RecordSet&& ro) {
-      // copy number of strings ?
-      //*this = std::move(ro);
-
-      allocateAndCopy(std::move(ro));
-   }
+   // Move constructor 
+   RecordSet::RecordSet(RecordSet&& ro) { *this = std::move(ro); }
 
    // Move assignment operator
-   RecordSet& RecordSet::operator=(const RecordSet&& ro) {
+   RecordSet& RecordSet::operator=(RecordSet&& ro) {
       if (this != &ro) {
-         delete[] m_pStrings;
-         allocateAndCopy(ro);
+         m_pStrings = ro.m_pStrings;
+         ro.m_pStrings = nullptr;
       }
       return *this;
    }
 
-   //
+   // 
    void RecordSet::allocateAndCopy(const RecordSet& ro) {
       // Allocate string array based on number of strings
       m_pStrings = new std::string[m_numberOfStrings];
@@ -103,6 +95,7 @@ namespace sdds {
    // Destructor
    RecordSet::~RecordSet() {
       delete[] m_pStrings;
+      --m_numberOfStrings;
    }
 
    // Return number of strings 

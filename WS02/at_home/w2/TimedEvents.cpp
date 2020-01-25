@@ -5,9 +5,7 @@
 //
 // I confirm that the content of this file is created by me,
 //   with the exception of the parts provided to me by my professor.
-#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include <cstring>
 #include <iomanip>
 //#include <chrono>
 #include "TimedEvents.h"
@@ -32,7 +30,7 @@ namespace sdds {
       m_endTime = std::chrono::steady_clock::now();
    }
 
-   //
+   // Updates next time record in the "m_records" array 
    void TimedEvents::recordEvent(const char* cString) {
       if (m_numOfRecords < MAXRECORDS) {
          this->m_records[m_numOfRecords].m_eventName = cString;
@@ -43,7 +41,7 @@ namespace sdds {
       }
    }
 
-   //
+   // Insertion operator overload
    std::ostream& operator<<(std::ostream& os, const TimedEvents& RO) {
       os << "--------------------------\n"
          << "Execution Times:\n"
