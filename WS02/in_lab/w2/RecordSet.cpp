@@ -56,10 +56,7 @@ namespace sdds {
    }
 
    // Copy constructor
-   RecordSet::RecordSet(const RecordSet& ro) {
-      m_numberOfStrings = ro.m_numberOfStrings;
-      allocateAndCopy(ro);
-   }
+   RecordSet::RecordSet(const RecordSet& ro) { *this = ro; }
 
    // Copy assignment operator
    RecordSet& RecordSet::operator=(const RecordSet& ro) {
@@ -73,7 +70,6 @@ namespace sdds {
       return *this;
    }
 
-   //
    void RecordSet::allocateAndCopy(const RecordSet& ro) {
       // Allocate string array based on number of strings
       m_pStrings = new std::string[m_numberOfStrings];
