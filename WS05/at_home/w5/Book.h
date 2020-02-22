@@ -26,15 +26,14 @@ namespace sdds {
       const std::string& description()const;
       double& price();
       void display(std::ostream& os)const;
-      
+      std::string getString(std::string& str);
       friend std::ostream& operator<<(std::ostream& os, const Book& ro);
-
+      void trim(std::string& str);
       template <typename T>
       void fixSpelling(T spellChecker) {
          spellChecker(m_description); // functor
       }
 
    };
-   void trim(std::string& str);
 }
 #endif // !SDDS_BOOK_H__

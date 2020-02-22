@@ -1,7 +1,7 @@
 // Name: Nathan Olah
 // Seneca Student ID: 124723198
 // Seneca email: nolah@myseneca.ca
-// Date of completion:
+// Date of completion: 2020/02/18
 //
 // I confirm that the content of this file is created by me,
 //   with the exception of the parts provided to me by my professor.
@@ -18,22 +18,55 @@ namespace sdds {
 
    //
    Movie::Movie(const std::string& strMovie) {
-      std::string copy = strMovie;
-      trim(copy); 
-      size_t position;
-
-      position = copy.find(',');
-      m_title = copy.substr(0, position);
+      std::string tempStr = strMovie;
+      trim(tempStr); 
+      
+      m_title = getString(tempStr);
       trim(m_title);
-      copy.erase(0, position + 1);
 
-      position = copy.find(',');
-      m_yearOfRelease = std::stoi(copy.substr(0, position));
-      copy.erase(0, position + 1);
+      m_yearOfRelease = std::stoi(getString(tempStr));
 
-      m_description = copy.substr(0);
+      m_description = tempStr.substr(0);
       trim(m_description);
 
+
+     /* pos = tempStr.find(',');
+      m_title = tempStr.substr(0, pos);
+      trim(m_title);
+      tempStr.erase(0, pos + 1);
+
+      pos = tempStr.find(',');
+      m_yearOfRelease = std::stoi(tempStr.substr(0, pos));
+      tempStr.erase(0, pos + 1);
+
+      m_description = tempStr.substr(0);
+      trim(m_description);*/
+
+   }
+
+   //
+   std::string Movie::getString(std::string& tempStr) {
+      std::size_t pos;
+      std::string str;
+
+      pos = tempStr.find(',');
+      str = tempStr.substr(0, pos); // extract the string     
+      tempStr.erase(0, pos + 1);
+
+      return str;
+   }
+
+
+   // Removes whitespace around the string
+   void Movie::trim(std::string& str) {
+      size_t i = 0;
+      // Remove leading whitespace
+      for (i = 0; i < str.length() && str[i] == ' '; i++); // gets index of whitespace
+      str = str.substr(i);
+
+      // Remove trailing whitespace
+      for (i = str.length(); i > 0 && str[i - 1] == ' '; i--);
+      str = str.substr(0, i);
    }
 
    const std::string& Movie::title()const {
