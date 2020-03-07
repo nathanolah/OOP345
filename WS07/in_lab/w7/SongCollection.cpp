@@ -1,7 +1,7 @@
 // Name: Nathan Olah 
-// Seneca Student ID:
-// Seneca email:
-// Date of completion:
+// Seneca Student ID: 124723198
+// Seneca email: nolah@myseneca.ca
+// Date of completion: 2020/03/07
 //
 // I confirm that the content of this file is created by me,
 //   with the exception of the parts provided to me by my professor.
@@ -48,7 +48,7 @@ namespace sdds {
    }
 
    //
-   Song::Song() : m_price(0.0), m_songLength(0u) {}
+   Song::Song() : m_price(0.0) {}
    //
    SongCollection::SongCollection() {}
    SongCollection::~SongCollection() {
@@ -84,9 +84,12 @@ namespace sdds {
             trim(newSong->m_album);
 
             newSong->m_yearOfRelease = getString(tempStr, true);
+            trim(newSong->m_yearOfRelease);
 
-            if (stoi(tempStr))
-               newSong->m_songLength = stoi(getString(tempStr, true));
+            newSong->m_songLength = getString(tempStr, true);
+            trim(newSong->m_songLength);
+            newSong->m_songLength.insert(1, 1, ':');
+
             if (stod(tempStr))
                newSong->m_price = stod(getString(tempStr, true));
 
@@ -98,17 +101,19 @@ namespace sdds {
       file.close();
    }
 
+
    // Iterate through the collection 
    void SongCollection::display(std::ostream& out)const {
       std::for_each(m_songs.begin(), m_songs.end(), [&](const Song* song) { out << *song << endl; });
    }
 
    std::ostream& operator<<(std::ostream& out, const Song& theSong) {
+      
       out << "| " << left << setw(20) << theSong.m_title
          << " | " << left << setw(15) << theSong.m_artist
          << " | " << left << setw(20) << theSong.m_album
          << " | " << right << setw(6) << theSong.m_yearOfRelease
-         << " | " << theSong.m_songLength // insert colon // make query of this with inserted colon value
+         << " | " << theSong.m_songLength
          << " | " << theSong.m_price << " | ";
       return out;
    }

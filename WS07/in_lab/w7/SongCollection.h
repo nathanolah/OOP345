@@ -1,7 +1,7 @@
-// Name:
-// Seneca Student ID:
-// Seneca email:
-// Date of completion:
+// Name: Nathan Olah
+// Seneca Student ID: 124723198
+// Seneca email: nolah@myseneca.ca
+// Date of completion: 2020/03/07
 //
 // I confirm that the content of this file is created by me,
 //   with the exception of the parts provided to me by my professor.
@@ -16,8 +16,8 @@ namespace sdds {
       std::string m_title;
       std::string m_album;
       double m_price = 0;
-      std::string m_yearOfRelease;
-      size_t m_songLength = 0; // or double ? find and replace '.' with ':'
+      std::string m_yearOfRelease; // If no year provided must be empty string
+      std::string m_songLength; // string so that colon can be inserted
       Song();
    };
 
