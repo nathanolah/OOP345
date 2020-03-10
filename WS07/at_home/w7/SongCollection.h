@@ -23,7 +23,7 @@ namespace sdds {
    };
 
    class SongCollection {
-      std::vector<Song*> m_songs;
+      std::vector<Song> m_songs;
    public:
       SongCollection();
       ~SongCollection();
@@ -35,6 +35,7 @@ namespace sdds {
       std::list<Song> getSongsForArtist(std::string str)const;
 
       std::string totalTime()const;
+      void getTime(std::string songLength, size_t& minutes, size_t& seconds)const;
    };
    std::ostream& operator<<(std::ostream& out, const Song& theSong);
 

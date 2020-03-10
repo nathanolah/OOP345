@@ -12,6 +12,7 @@
 #include <string>
 #include <algorithm>
 #include <numeric>
+#include <chrono>
 #include "SongCollection.h"
 using namespace std;
 namespace sdds {
@@ -53,9 +54,7 @@ namespace sdds {
    //
    SongCollection::SongCollection() {}
    SongCollection::~SongCollection() {
-      // Deallocate Song
       while (!m_songs.empty()) {
-         delete m_songs.back();
          m_songs.pop_back();
       }
    }
@@ -69,29 +68,28 @@ namespace sdds {
       }
       while (file) {
 
-         // Create instance of Song
-         Song* newSong = new Song();
+         Song newSong;
 
          string tempStr;
          getline(file, tempStr, '\n');
 
          if (tempStr != "") {
-            newSong->m_title = getString(tempStr, false);
-            trim(newSong->m_title);
-            newSong->m_artist = getString(tempStr, false);
-            trim(newSong->m_artist);
-            newSong->m_album = getString(tempStr, false);
-            trim(newSong->m_album);
+            newSong.m_title = getString(tempStr, false);
+            trim(newSong.m_title);
+            newSong.m_artist = getString(tempStr, false);
+            trim(newSong.m_artist);
+            newSong.m_album = getString(tempStr, false);
+            trim(newSong.m_album);
 
-            newSong->m_yearOfRelease = getString(tempStr, true);
-            trim(newSong->m_yearOfRelease);
+            newSong.m_yearOfRelease = getString(tempStr, true);
+            trim(newSong.m_yearOfRelease);
 
-            newSong->m_songLength = getString(tempStr, true);
-            trim(newSong->m_songLength);
-            newSong->m_songLength.insert(1, 1, ':');
+            newSong.m_songLength = getString(tempStr, true);
+            trim(newSong.m_songLength);
+            newSong.m_songLength.insert(1, 1, ':');
 
             if (stod(tempStr))
-               newSong->m_price = stod(getString(tempStr, true));
+               newSong.m_price = stod(getString(tempStr, true));
 
             // Add song to m_songs
             m_songs.push_back(newSong);
@@ -103,61 +101,84 @@ namespace sdds {
 
    std::list<Song> SongCollection::getSongsForArtist(std::string str)const {
       std::list<Song> newList;
-      std::for_each(m_songs.begin(), m_songs.end(), [&](Song* song) {
-         if (song->m_artist == str) newList.push_back(*song);
+      std::for_each(m_songs.begin(), m_songs.end(), [&](Song song) {
+         if (song.m_artist == str) newList.push_back(song);
       });
       return newList;
    }
 
    bool SongCollection::inCollection(std::string str)const {
       bool ok = false;
-      std::for_each(m_songs.begin(), m_songs.end(), [&](Song* song) {
-         if (song->m_artist == str) ok = true;
+      std::for_each(m_songs.begin(), m_songs.end(), [&](Song song) {
+         if (song.m_artist == str) ok = true;
       });
       return ok;
    }
 
    void SongCollection::cleanAlbum() {
-      std::for_each(m_songs.begin(), m_songs.end(), [&](Song* song) { 
-         if (song->m_album == "[None]") song->m_album.clear();
+      std::for_each(m_songs.begin(), m_songs.end(), [&](Song &song) { 
+         if (song.m_album == "[None]") 
+            song.m_album.clear();
       });
    }
 
    void SongCollection::sort(std::string str) {
       if (str == "title") {
-         std::sort(m_songs.begin(), m_songs.end(), [](Song* i, Song* j) { return i->m_title < j->m_title; });
+         std::sort(m_songs.begin(), m_songs.end(), [](Song i, Song j) { return i.m_title < j.m_title; });
       }
       else if (str == "length") {
-         std::sort(m_songs.begin(), m_songs.end(), [](Song* i, Song* j) { return i->m_songLength < j->m_songLength; });
+         std::sort(m_songs.begin(), m_songs.end(), [](Song i, Song j) { return i.m_songLength < j.m_songLength; });
       } 
       else if (str == "album") {
-         std::sort(m_songs.begin(), m_songs.end(), [](Song* i, Song* j) { return i->m_album < j->m_album; });
-      }
+         std::sort(m_songs.begin(), m_songs.end(), [](Song i, Song j) { return i.m_album < j.m_album; });
+      } 
    }
 
+   void SongCollection::getTime(std::string songLength, size_t &minutes, size_t &seconds)const {
+      size_t pos;
 
-   // TO DO : SUM UP THE TIME 
+      pos = songLength.find(':');
+      minutes += stoi(songLength.substr(0, pos));
+      songLength.erase(0, pos + 1);
+      seconds += stoi(songLength);
+
+   }
+
    std::string SongCollection::totalTime()const {
+      static size_t minutes = 0;
+      static size_t seconds = 0;
+      static size_t hours = 0;
       string total;
 
-      std::for_each(m_songs.begin(), m_songs.end(), [&](Song* song) { total += song->m_songLength; });
+      std::for_each(m_songs.begin(), m_songs.end(), [&](Song song) { getTime(song.m_songLength, minutes, seconds); });
 
+      minutes += (seconds / 60);
+      hours += (minutes / 60);
+      minutes %= 60;
+      seconds %= 60;
+      hours %= 60;
 
-      //std::accumulate(m_songs.begin(), m_songs.end(), [&](Song* song) { total += song->m_songLength; });
+      total = to_string(hours) + ":" + to_string(minutes) + ":" + to_string(seconds);
 
       return total;
    }
 
    // Iterate through the collection 
    void SongCollection::display(std::ostream& out)const {
-      std::for_each(m_songs.begin(), m_songs.end(), [&](const Song* song) { out << *song << endl; });
+      static bool called = false;
+      static string total;
+
+      std::for_each(m_songs.begin(), m_songs.end(), [&](const Song song) { out << song << endl; });
 
       // Total time
-      // iterate through a function which returns total time
-      auto total = totalTime();
+      // Time is only added up one time
+      if (!called) {
+         called = true;
+         total = totalTime();
+      }
 
       out << std::setw(89) << std::setfill('-') << '\n' << std::setfill(' ');
-      out << "| " << std::right << std::setw(85) << "Total Listening Time: " << total << std::right << "|\n";
+      out << "| " << std::right << std::setw(77) << "Total Listening Time: " << total << " " << std::right << "|\n";
 
    }
 
