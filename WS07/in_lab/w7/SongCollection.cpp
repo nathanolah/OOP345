@@ -52,9 +52,8 @@ namespace sdds {
    //
    SongCollection::SongCollection() {}
    SongCollection::~SongCollection() {
-      // Deallocate Song
       while (!m_songs.empty()) {
-         delete m_songs.back();
+        // delete m_songs.back();
          m_songs.pop_back();
       }
    }
@@ -68,14 +67,31 @@ namespace sdds {
       }
       while (file) {
          
-         // Create instance of Song
-         Song* newSong = new Song();
-         //Song newSong;
-         
+         Song newSong;
+
          string tempStr;
          getline(file, tempStr, '\n'); 
 
          if (tempStr != "") {
+            newSong.m_title = getString(tempStr, false);
+            trim(newSong.m_title);
+            newSong.m_artist = getString(tempStr, false);
+            trim(newSong.m_artist);
+            newSong.m_album = getString(tempStr, false);
+            trim(newSong.m_album);
+
+            newSong.m_yearOfRelease = getString(tempStr, true);
+            trim(newSong.m_yearOfRelease);
+
+            newSong.m_songLength = getString(tempStr, true);
+            trim(newSong.m_songLength);
+            newSong.m_songLength.insert(1, 1, ':');
+
+            if (stod(tempStr))
+               newSong.m_price = stod(getString(tempStr, true));
+
+            // THIS WAS WHEN I WAS TRYING TO USE Song DYNAMICALLY
+            /*
             newSong->m_title = getString(tempStr, false);
             trim(newSong->m_title);
             newSong->m_artist = getString(tempStr, false);
@@ -91,20 +107,21 @@ namespace sdds {
             newSong->m_songLength.insert(1, 1, ':');
 
             if (stod(tempStr))
-               newSong->m_price = stod(getString(tempStr, true));
+               newSong->m_price = stod(getString(tempStr, true));*/
 
             // Add song to m_songs
             m_songs.push_back(newSong);
          }
-
+         
       }
       file.close();
    }
 
-
    // Iterate through the collection 
    void SongCollection::display(std::ostream& out)const {
-      std::for_each(m_songs.begin(), m_songs.end(), [&](const Song* song) { out << *song << endl; });
+      //std::for_each(m_songs.begin(), m_songs.end(), [&](const Song* song) { out << *song << endl; });
+      std::for_each(m_songs.begin(), m_songs.end(), [&](const Song song) { out << song << endl; });
+
    }
 
    std::ostream& operator<<(std::ostream& out, const Song& theSong) {

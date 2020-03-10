@@ -22,7 +22,8 @@ namespace sdds {
    };
 
    class SongCollection {
-      std::vector<Song*> m_songs;
+      //std::vector<Song*> m_songs;
+      std::vector<Song> m_songs;
    public:
       SongCollection();
       ~SongCollection();
