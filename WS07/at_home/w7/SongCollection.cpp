@@ -145,9 +145,9 @@ namespace sdds {
    }
 
    std::string SongCollection::totalTime()const {
-      static size_t minutes = 0;
-      static size_t seconds = 0;
-      static size_t hours = 0;
+      size_t minutes = 0;
+      size_t seconds = 0;
+      size_t hours = 0;
       string total;
 
       std::for_each(m_songs.begin(), m_songs.end(), [&](Song song) { getTime(song.m_songLength, minutes, seconds); });
@@ -171,11 +171,7 @@ namespace sdds {
       std::for_each(m_songs.begin(), m_songs.end(), [&](const Song song) { out << song << endl; });
 
       // Total time
-      // Time is only added up one time
-      if (!called) {
-         called = true;
-         total = totalTime();
-      }
+      total = totalTime();
 
       out << std::setw(89) << std::setfill('-') << '\n' << std::setfill(' ');
       out << "| " << std::right << std::setw(77) << "Total Listening Time: " << total << " " << std::right << "|\n";
