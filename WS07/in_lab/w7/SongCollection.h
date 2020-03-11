@@ -22,13 +22,14 @@ namespace sdds {
    };
 
    class SongCollection {
-      //std::vector<Song*> m_songs;
       std::vector<Song> m_songs;
    public:
       SongCollection();
       ~SongCollection();
       SongCollection(const char* filename);
       void display(std::ostream& out)const;
+      void getTime(std::string& str);
+      std::string checkTime(size_t seconds);
    };
    std::ostream& operator<<(std::ostream& out, const Song& theSong);
 
