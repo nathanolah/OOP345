@@ -34,8 +34,15 @@ namespace sdds {
       bool inCollection(std::string str)const;
       std::list<Song> getSongsForArtist(std::string str)const;
 
+
       std::string totalTime()const;
       void getTime(std::string songLength, size_t& minutes, size_t& seconds)const;
+     
+
+      // set the time
+      std::string checkTime(size_t seconds);
+      void setTime(std::string& str);
+   
    };
    std::ostream& operator<<(std::ostream& out, const Song& theSong);
 

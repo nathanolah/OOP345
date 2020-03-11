@@ -11,8 +11,6 @@
 #include <fstream>
 #include <string>
 #include <algorithm>
-#include <numeric>
-#include <chrono>
 #include "SongCollection.h"
 using namespace std;
 namespace sdds {
@@ -86,7 +84,7 @@ namespace sdds {
 
             newSong.m_songLength = getString(tempStr, true);
             trim(newSong.m_songLength);
-            newSong.m_songLength.insert(1, 1, ':');
+            setTime(newSong.m_songLength);
 
             if (stod(tempStr))
                newSong.m_price = stod(getString(tempStr, true));
@@ -134,6 +132,40 @@ namespace sdds {
       } 
    }
 
+   // Corrects time format 
+   std::string SongCollection::checkTime(size_t seconds) {
+      string str;
+      if (seconds < 10) {
+         str = to_string(seconds);
+         str.insert(0, "0");
+      }
+      else {
+         str = to_string(seconds);
+      }
+      return str;
+   }
+
+   void SongCollection::setTime(std::string& str) {
+      size_t seconds = 0;
+      size_t minutes = 0;
+      size_t hours = 0;
+
+      seconds = stoi(str);
+
+      minutes += (seconds / 60);
+      hours += (minutes / 60);
+      minutes %= 60;
+      seconds %= 60;
+      hours %= 60;
+
+      if (hours != 0) {
+         str = to_string(hours) + ":" + to_string(minutes) + ":" + to_string(seconds);
+      }
+      else {
+         str = to_string(minutes) + ":" + checkTime(seconds);
+      }
+   }
+
    void SongCollection::getTime(std::string songLength, size_t &minutes, size_t &seconds)const {
       size_t pos;
 
@@ -144,6 +176,7 @@ namespace sdds {
 
    }
 
+   // Gets total time
    std::string SongCollection::totalTime()const {
       size_t minutes = 0;
       size_t seconds = 0;
@@ -165,8 +198,7 @@ namespace sdds {
 
    // Iterate through the collection 
    void SongCollection::display(std::ostream& out)const {
-      static bool called = false;
-      static string total;
+      string total;
 
       std::for_each(m_songs.begin(), m_songs.end(), [&](const Song song) { out << song << endl; });
 
@@ -184,7 +216,7 @@ namespace sdds {
          << " | " << left << setw(20) << theSong.m_album
          << " | " << right << setw(6) << theSong.m_yearOfRelease
          << " | " << theSong.m_songLength
-         << " | " << theSong.m_price << " | ";
+         << " | " << theSong.m_price << " |";
       return out;
    }
 }
