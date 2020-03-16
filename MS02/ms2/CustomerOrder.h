@@ -8,6 +8,7 @@
 #ifndef SDDS_CUSTOMERORDER_H__
 #define SDDS_CUSTOMERORDER_H__
 #include <iostream>
+#include <memory>
 #include "Station.h"
 struct Item {
    std::string m_itemName;
@@ -15,13 +16,16 @@ struct Item {
    bool m_isFilled = false;
 
    Item(const std::string& src) : m_itemName(src) {};
-
+   
+   
+   //~Item() {};
    Item() {};
-   Item(const Item& ro) {
+
+  /* Item(const Item& ro) {
       m_itemName = ro.m_itemName;
       m_serialNumber = ro.m_serialNumber;
       m_isFilled = ro.m_isFilled;
-   }
+   }*/
 
 };
 
@@ -29,13 +33,16 @@ class CustomerOrder {
    std::string m_name;
    std::string m_product;
    unsigned int m_cntItem;
-   Item* m_lstItem; // or ** ???? try using a vector
+
+   //std::unique_ptr<Item[]> m_lstItem;
+
+   Item* m_lstItem; 
    static size_t m_widthField;
 public:
    CustomerOrder();
    ~CustomerOrder();
-   CustomerOrder(std::string& str);
 
+   explicit CustomerOrder(std::string& str);
    CustomerOrder(const CustomerOrder& ro);
    CustomerOrder& operator=(const CustomerOrder& ro) = delete;
 

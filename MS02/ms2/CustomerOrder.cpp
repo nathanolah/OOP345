@@ -14,11 +14,10 @@
 using namespace std;
 
 size_t CustomerOrder::m_widthField(0u);
-
-CustomerOrder::CustomerOrder() : m_cntItem(0u) {}
+CustomerOrder::CustomerOrder() : m_cntItem(0u), m_lstItem(nullptr) {}
 
 CustomerOrder::~CustomerOrder() {
-   delete[] m_lstItem; // check over
+   delete[] m_lstItem; 
 }
 
 CustomerOrder::CustomerOrder(std::string& str) {
@@ -36,49 +35,65 @@ CustomerOrder::CustomerOrder(std::string& str) {
    if (m_widthField < newStr.getFieldWidth())
       m_widthField = newStr.getFieldWidth();
 
-
+   // Count the amount of items
    m_cntItem = std::count(str.begin(), str.end(), newStr.getDelimiter()) - 1;
-   // Allocate for number of items
-   m_lstItem = new Item[m_cntItem]; 
-
+  
    // Check for items
    if (m_cntItem >= 1) {
+
+      // Allocate for number of items
+      m_lstItem = new Item[m_cntItem];
+
       // Copy tokens into m_lstItem
       for (size_t i = 0; i < m_cntItem; i++) {
-         string tempStr = newStr.extractToken(str, next_pos, more); // gets stuck in the forloop
+
+         string tempStr = newStr.extractToken(str, next_pos, more);
          Item newItem(tempStr);
-
-         // m_lstItem needs to be intialized
-         m_lstItem[i] = newItem; // TO DO : TRY USING A VECTOR
-
-
-        // m_lstItem[i].m_itemName = newStr.extractToken(str, next_pos, more);
+         m_lstItem[i] = newItem; 
+         
+         //m_lstItem[i].m_itemName = newStr.extractToken(str, next_pos, more);
       }
    }
    else {
+      delete[] m_lstItem;
+      m_lstItem = nullptr;
+
       throw "No items found";
    }
 }
 
 void CustomerOrder::display(std::ostream& os)const {
-   os << std::setw(m_widthField) << m_name << " - " << m_product << endl;
+   os << m_name << " - " << m_product << endl;
 
-   // FIX THIS
    for (size_t i = 0; i < m_cntItem; i++) {
-      os << setw(6) << "[" << m_lstItem->m_serialNumber << "] " << m_lstItem->m_itemName << " - "
-         << ((!isOrderFilled()) ? "MISSING" : "FILLED") << endl;
+      os << "[" << setw(6) << setfill('0') << m_lstItem[i].m_serialNumber << "] "
+         << setw(m_widthField) << left << setfill(' ') << m_lstItem[i].m_itemName 
+         << right << " - "  << ((!isOrderFilled()) ? "MISSING" : "FILLED") << endl;
    }
 }
 
 void CustomerOrder::fillItem(Station& station, std::ostream& os) {
-   // TO DO : FINISH THIS FUNCTION
-}
+   
+   for (size_t i = 0; i < m_cntItem; i++) {
+      if (m_lstItem[i].m_itemName == station.getItemName()) {
+         if (station.getQuantity() == 0) {
+            os << "Unable to fill " << m_name << ", " << m_product << " [" << m_lstItem[i].m_itemName << "]"  << " is empty " << endl;
+         }
+         else {
+               station.updateQuantity();
+               m_lstItem[i].m_serialNumber = station.getNextSerialNumber();
+               m_lstItem[i].m_isFilled = true;
+               os << "    Filled " << m_name << ", " << m_product << " [" << m_lstItem[i].m_itemName << "]" << endl;
+         }
+      }
+   }
 
+}
 
 bool CustomerOrder::isItemFilled(const std::string& itemName)const {
    for (size_t i = 0; i < m_cntItem; i++) {
       if (m_lstItem[i].m_itemName == itemName) {
-         if (!isOrderFilled())
+         if (!m_lstItem[i].m_isFilled)
             return false;
       }
    }
@@ -89,14 +104,21 @@ bool CustomerOrder::isOrderFilled()const {
    bool filled = true;
    for (size_t i = 0; i < m_cntItem; i++) {
       if (!m_lstItem[i].m_isFilled) {
-         filled = false;
+        filled = false;
       }
    }
    return filled;
-   
 }
 
 CustomerOrder::CustomerOrder(const CustomerOrder& ro) {
+   m_lstItem = ro.m_lstItem;
+   delete[] m_lstItem;
+   m_lstItem = nullptr;
+
+   //delete[] ro.m_lstItem;
+
+   //ro.m_lstItem = nullptr;
+
    throw ""; // CHANGE THIS 
 }
 
@@ -111,7 +133,6 @@ CustomerOrder& CustomerOrder::operator=(CustomerOrder&& ro)noexcept {
       m_product = ro.m_product;
       m_cntItem = ro.m_cntItem;
       m_lstItem = ro.m_lstItem;
-
       ro.m_lstItem = nullptr;
    }
    return *this;

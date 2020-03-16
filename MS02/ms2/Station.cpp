@@ -28,7 +28,7 @@ Station::Station(const std::string& str) {
    m_nameOfItem = newStr.extractToken(str, next_pos, more);
    m_serialNumber = std::stoi(newStr.extractToken(str, next_pos, more));
    m_numberOfItems = std::stoi(newStr.extractToken(str, next_pos, more));
-   m_description = str.substr(next_pos);
+   m_description = str.substr(next_pos + 1);
    m_id = ++m_idGenerator;
 
    if (m_widthField < newStr.getFieldWidth())
@@ -40,7 +40,9 @@ const std::string& Station::getItemName()const {
 }
 
 unsigned int Station::getNextSerialNumber() {
-   return m_serialNumber++;
+   unsigned serialNumber = m_serialNumber;
+   m_serialNumber++;
+   return serialNumber;
 }
 
 unsigned int Station::getQuantity()const {

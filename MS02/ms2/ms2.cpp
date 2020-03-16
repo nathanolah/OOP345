@@ -96,39 +96,39 @@ int main(int argc, char** argv)
 		tmp.display(cout);
 		cout << endl;
 
-	//	cout << "CustomerOrders::CustomerOrders(string): "; // Test #4
-	//	string strRecord = "Chloe/Flight PC/CPU/GPU/Power Supply";
-	//	Utilities::setDelimiter('/');
-	//	CustomerOrder tmp2(strRecord);
-	//	tmp2.display(cout);
-	//	cout << endl;
+		cout << "CustomerOrders::CustomerOrders(string): "; // Test #4
+		string strRecord = "Chloe/Flight PC/CPU/GPU/Power Supply";
+		Utilities::setDelimiter('/');
+		CustomerOrder tmp2(strRecord);
+		tmp2.display(cout);
+		cout << endl;
 
-	//	cout << "CustomerOrders::operator=(&&): "; // Test #5
-	//	tmp2 = std::move(theOrders[theOrders.size() - 1]);
-	//	theOrders.pop_back();
-	//	tmp2.display(cout);
-	//	cout << endl;
+		cout << "CustomerOrders::operator=(&&): "; // Test #5
+		tmp2 = std::move(theOrders[theOrders.size() - 1]);
+		theOrders.pop_back();
+		tmp2.display(cout);
+		cout << endl;
 
-	//	cout << "CustomerOrders::fillItem()" << endl; // Test #6
-	//	cout << "isOrderFilled(): "
-	//		<< (tmp2.isOrderFilled() ? "FILLED" : "MISSING")
-	//		<< endl;
+		cout << "CustomerOrders::fillItem()" << endl; // Test #6
+		cout << "isOrderFilled(): "
+			<< (tmp2.isOrderFilled() ? "FILLED" : "MISSING")
+			<< endl;
 
-	//	tmp2.fillItem(theStations[0], cout);
-	//	cout << "isItemFilled(\"CPU\"): "
-	//		<< (tmp2.isItemFilled("CPU") ? "FILLED" : "MISSING")
-	//		<< endl;
+		tmp2.fillItem(theStations[0], cout);
+		cout << "isItemFilled(\"CPU\"): "
+			<< (tmp2.isItemFilled("CPU") ? "FILLED" : "MISSING")
+			<< endl;
 
-	//	cout << "isOrderFilled(): "
-	//		<< (tmp2.isOrderFilled() ? "FILLED" : "MISSING")
-	//		<< endl;
+		cout << "isOrderFilled(): "
+			<< (tmp2.isOrderFilled() ? "FILLED" : "MISSING")
+			<< endl;
 
-	//	for (size_t i = 0; i < theStations.size(); i++)
-	//		tmp2.fillItem(theStations[i], cout);
+		for (size_t i = 0; i < theStations.size(); i++)
+			tmp2.fillItem(theStations[i], cout);
 
-	//	cout << "isOrderFilled(): "
-	//		<< (tmp2.isOrderFilled() ? "FILLED" : "MISSING")
-	//		<< endl;
+		cout << "isOrderFilled(): "
+			<< (tmp2.isOrderFilled() ? "FILLED" : "MISSING")
+			<< endl;
 	}
 	return 0;
 }
