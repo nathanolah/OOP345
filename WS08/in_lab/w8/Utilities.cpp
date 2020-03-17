@@ -1,3 +1,11 @@
+// Name: Nathan Olah
+// Seneca Student ID: 124723198
+// Seneca email: nolah@myseneca.ca
+// Date of completion: 2020/03/15
+//
+// I confirm that the content of this file is created by me,
+//   with the exception of the parts provided to me by my professor.
+
 // Workshop 8 - Smart Pointers
 // 2019/11 - Cornel
 
@@ -18,13 +26,19 @@ namespace sdds {
 			for (size_t j = 0; j < price.size(); j++) {
 				if (desc[i].code == price[j].code) {
 					Product* p = new Product(desc[i].desc, price[j].price);
-					p->validate();
+					try {
+						p->validate();
+					}
+					catch (std::string error) {
+						delete p;
+						throw error;
+					}
 					priceList += p;
 					delete p;
 				}
 			}
 		}
-
+		
 
 		return priceList;
 	}

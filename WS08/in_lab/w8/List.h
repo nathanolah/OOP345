@@ -1,3 +1,11 @@
+// Name: Nathan Olah
+// Seneca Student ID: 124723198
+// Seneca email: nolah@myseneca.ca
+// Date of completion: 2020/03/15
+//
+// I confirm that the content of this file is created by me,
+//   with the exception of the parts provided to me by my professor.
+
 #ifndef SDDS_LIST_H
 #define SDDS_LIST_H
 // Workshop 8 - Smart Pointers
@@ -25,7 +33,7 @@ namespace sdds {
 			while (file) {
 				T e;
 				if (e.load(file))
-					list.push_back(*new T(e));
+					list.push_back(T(e));
 			}
 		}
 		size_t size() const { return list.size(); }

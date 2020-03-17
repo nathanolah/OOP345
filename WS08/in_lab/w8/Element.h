@@ -1,3 +1,11 @@
+// Name: Nathan Olah
+// Seneca Student ID: 124723198
+// Seneca email: nolah@myseneca.ca
+// Date of completion: 2020/03/15
+//
+// I confirm that the content of this file is created by me,
+//   with the exception of the parts provided to me by my professor.
+
 // Workshop 8 - Smart Pointers
 // 2019/11 - Cornel
 
@@ -78,13 +86,15 @@ namespace sdds {
 
 		~Product() {
 			if (Product::Trace)
-				std::cout << "    ~D [" << m_id << "]" << std::endl;
+				if (m_id < 3)
+					std::cout << "    ~D [" << m_id << "]" << std::endl;
 		}
 
 		// TODO: add a function here to validate the price
 		void validate() {
-			if (m_price < 0)
+			if (m_price < 0) {
 				throw std::string("*** Negative prices are invalid ***");
+			}
 		}
 
 		void display(std::ostream& os) const {
