@@ -30,30 +30,20 @@ char Utilities::getDelimiter() {
 }
 
 std::string Utilities::extractToken(const std::string& str, size_t& next_pos, bool& more) {
-   //size_t pos;
    string token;
-   
-  
+   size_t nextDelimiterPos;
+   size_t tokenLength;
+
    if (next_pos == 0) {
       next_pos = str.find(getDelimiter());
       token = str.substr(0, next_pos);
    }
    else {
-
-      size_t next_delimiter_pos = str.find(m_delimiter, next_pos + 1);	// find the next delimiter from 1 character after the previous one
-
-      size_t word_length = (next_delimiter_pos - next_pos) - 1;
-
-      token = str.substr(next_pos + 1, word_length);			// extract the string that starts from next_pos with the length of the next word
-      next_pos = next_delimiter_pos;
-
+      nextDelimiterPos = str.find(m_delimiter, next_pos + 1); // Find the next delimiter from 1 character after the previous one
+      tokenLength = (nextDelimiterPos - next_pos) - 1;
+      token = str.substr(next_pos + 1, tokenLength); // Extract the string that starts from next_pos with the length of the next token
+      next_pos = nextDelimiterPos;
    }
-
-   //pos = str.find(getDelimiter(), next_pos);
-   //for (size_t i = next_pos; i < pos; i++) { count++; }
-
-   //token = str.substr(next_pos, count);
-   //next_pos = pos + 1; // Set the next position
 
    try {
 

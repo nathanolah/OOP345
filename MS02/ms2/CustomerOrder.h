@@ -14,29 +14,16 @@ struct Item {
    std::string m_itemName;
    unsigned int m_serialNumber = 0;
    bool m_isFilled = false;
-
    Item(const std::string& src) : m_itemName(src) {};
-   
-   
-   //~Item() {};
    Item() {};
-
-  /* Item(const Item& ro) {
-      m_itemName = ro.m_itemName;
-      m_serialNumber = ro.m_serialNumber;
-      m_isFilled = ro.m_isFilled;
-   }*/
-
 };
 
 class CustomerOrder {
    std::string m_name;
    std::string m_product;
    unsigned int m_cntItem;
-
-   //std::unique_ptr<Item[]> m_lstItem;
-
-   Item* m_lstItem; 
+   std::unique_ptr<Item>* m_lstItem;
+   //Item* m_lstItem; 
    static size_t m_widthField;
 public:
    CustomerOrder();

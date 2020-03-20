@@ -8,6 +8,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <memory>
 #include "CustomerOrder.h"
 #include "Utilities.h"
 #include "Station.h"
@@ -17,7 +18,7 @@ size_t CustomerOrder::m_widthField(0u);
 CustomerOrder::CustomerOrder() : m_cntItem(0u), m_lstItem(nullptr) {}
 
 CustomerOrder::~CustomerOrder() {
-   delete[] m_lstItem; 
+   delete[] m_lstItem;
 }
 
 CustomerOrder::CustomerOrder(std::string& str) {
@@ -41,23 +42,20 @@ CustomerOrder::CustomerOrder(std::string& str) {
    // Check for items
    if (m_cntItem >= 1) {
 
-      // Allocate for number of items
-      m_lstItem = new Item[m_cntItem];
-
+      // Allocate a for number of items using a unique_ptr
+      m_lstItem = new std::unique_ptr<Item>[m_cntItem];
+  
       // Copy tokens into m_lstItem
       for (size_t i = 0; i < m_cntItem; i++) {
-
          string tempStr = newStr.extractToken(str, next_pos, more);
-         Item newItem(tempStr);
-         m_lstItem[i] = newItem; 
-         
-         //m_lstItem[i].m_itemName = newStr.extractToken(str, next_pos, more);
+         //Item newItem(tempStr);
+
+         m_lstItem[i] = std::unique_ptr<Item>(new Item(tempStr));
       }
    }
    else {
       delete[] m_lstItem;
       m_lstItem = nullptr;
-
       throw "No items found";
    }
 }
@@ -66,8 +64,8 @@ void CustomerOrder::display(std::ostream& os)const {
    os << m_name << " - " << m_product << endl;
 
    for (size_t i = 0; i < m_cntItem; i++) {
-      os << "[" << setw(6) << setfill('0') << m_lstItem[i].m_serialNumber << "] "
-         << setw(m_widthField) << left << setfill(' ') << m_lstItem[i].m_itemName 
+      os << "[" << setw(6) << setfill('0') << m_lstItem[i]->m_serialNumber << "] "
+         << setw(m_widthField) << left << setfill(' ') << m_lstItem[i]->m_itemName 
          << right << " - "  << ((!isOrderFilled()) ? "MISSING" : "FILLED") << endl;
    }
 }
@@ -75,15 +73,15 @@ void CustomerOrder::display(std::ostream& os)const {
 void CustomerOrder::fillItem(Station& station, std::ostream& os) {
    
    for (size_t i = 0; i < m_cntItem; i++) {
-      if (m_lstItem[i].m_itemName == station.getItemName()) {
+      if (m_lstItem[i]->m_itemName == station.getItemName()) {
          if (station.getQuantity() == 0) {
-            os << "Unable to fill " << m_name << ", " << m_product << " [" << m_lstItem[i].m_itemName << "]"  << " is empty " << endl;
+            os << "Unable to fill " << m_name << ", " << m_product << " [" << m_lstItem[i]->m_itemName << "]"  << " is empty " << endl;
          }
          else {
                station.updateQuantity();
-               m_lstItem[i].m_serialNumber = station.getNextSerialNumber();
-               m_lstItem[i].m_isFilled = true;
-               os << "    Filled " << m_name << ", " << m_product << " [" << m_lstItem[i].m_itemName << "]" << endl;
+               m_lstItem[i]->m_serialNumber = station.getNextSerialNumber();
+               m_lstItem[i]->m_isFilled = true;
+               os << "    Filled " << m_name << ", " << m_product << " [" << m_lstItem[i]->m_itemName << "]" << endl;
          }
       }
    }
@@ -92,8 +90,8 @@ void CustomerOrder::fillItem(Station& station, std::ostream& os) {
 
 bool CustomerOrder::isItemFilled(const std::string& itemName)const {
    for (size_t i = 0; i < m_cntItem; i++) {
-      if (m_lstItem[i].m_itemName == itemName) {
-         if (!m_lstItem[i].m_isFilled)
+      if (m_lstItem[i]->m_itemName == itemName) {
+         if (!m_lstItem[i]->m_isFilled)
             return false;
       }
    }
@@ -103,7 +101,7 @@ bool CustomerOrder::isItemFilled(const std::string& itemName)const {
 bool CustomerOrder::isOrderFilled()const {
    bool filled = true;
    for (size_t i = 0; i < m_cntItem; i++) {
-      if (!m_lstItem[i].m_isFilled) {
+      if (!m_lstItem[i]->m_isFilled) {
         filled = false;
       }
    }
@@ -111,24 +109,21 @@ bool CustomerOrder::isOrderFilled()const {
 }
 
 CustomerOrder::CustomerOrder(const CustomerOrder& ro) {
-   m_lstItem = ro.m_lstItem;
-   delete[] m_lstItem;
-   m_lstItem = nullptr;
-
-   //delete[] ro.m_lstItem;
-
-   //ro.m_lstItem = nullptr;
-
-   throw ""; // CHANGE THIS 
+   throw "";
 }
 
-
-CustomerOrder::CustomerOrder(CustomerOrder&& ro)noexcept {
+CustomerOrder::CustomerOrder(CustomerOrder&& ro)noexcept { 
+   m_name = "";
+   m_product = "";
+   m_cntItem = 0;
+   m_lstItem = new std::unique_ptr<Item>[m_cntItem];
    *this = std::move(ro);
 }
 
 CustomerOrder& CustomerOrder::operator=(CustomerOrder&& ro)noexcept {
    if (this != &ro) {
+      delete[] m_lstItem;
+      m_lstItem = nullptr;
       m_name = ro.m_name;
       m_product = ro.m_product;
       m_cntItem = ro.m_cntItem;
