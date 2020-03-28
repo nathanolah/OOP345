@@ -1,11 +1,10 @@
  /*Name: Nathan Olah
  Seneca Student ID: 124723198
  Seneca email: nolah@myseneca.ca
- Date of completion: 2020/03/09
+ Date of completion: 2020/03/28
 
  I confirm that I am the only author of this file
    and the content was created entirely by me.*/
-
 #include <iostream>
 #include <memory>
 #include <deque>
@@ -16,7 +15,6 @@
 using namespace std;
 
 Workstation::~Workstation() {}
-
 Workstation::Workstation() : Station() {
    m_pNextStation = nullptr;
 }
@@ -27,16 +25,10 @@ Workstation::Workstation(const std::string& str) : Station(str) {
 
 void Workstation::runProcess(std::ostream& os) {
    // runs a single cycle of the assembly line for the current station.
-
-   // IF THERE ARE CUSTOMERORDERS IN QUEUE 
-   // FILL THE ORDER IN THE FRONT AT CURRENT WORKSTATION
-
-
    if (!m_orders.empty()) {
       if (!m_orders.front().isItemFilled(this->getItemName()))
          m_orders.front().fillItem(*this, os);
    }
-   
 }
 
 bool Workstation::moveOrder() {
@@ -51,8 +43,8 @@ bool Workstation::moveOrder() {
             ok = true;
          }
    }
-   return ok;
 
+   return ok;
 }
 
 void Workstation::setNextStation(Station& station) {
@@ -88,7 +80,6 @@ void Workstation::display(std::ostream& os) {
       os << getItemName()
          << " --> "
          << m_pNextStation->getItemName() << endl;
-      //os << getItemName() << " --> " << m_pNextStation->getItemName() << endl;
    }
 }
 

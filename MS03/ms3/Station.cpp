@@ -27,8 +27,9 @@ Station::Station(const std::string& str) {
    size_t next_pos = 0;
    bool more = false;
 
-   if (!str.empty())
+   if (!str.empty()) {
       more = true;
+   }
 
       m_nameOfItem = newStr.extractToken(str, next_pos, more);
       m_serialNumber = std::stoi(newStr.extractToken(str, next_pos, more));

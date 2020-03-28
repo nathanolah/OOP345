@@ -1,7 +1,7 @@
 /*Name: Nathan Olah
 Seneca Student ID: 124723198
 Seneca email: nolah@myseneca.ca
-Date of completion: 2020/03/09
+Date of completion: 2020/03/28
 
 I confirm that I am the only author of this file
   and the content was created entirely by me.*/
@@ -9,15 +9,18 @@ I confirm that I am the only author of this file
 #include <vector>
 #include <fstream>
 #include <string>
+#include <algorithm>
 #include "LineManager.h"
 #include "Workstation.h"
 #include "CustomerOrder.h"
 #include "Utilities.h"
 using namespace std;
 
+LineManager::~LineManager() { delete emptyStation; }
+
 LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theStations,
    std::vector<CustomerOrder>& theOrders) {
-   static bool firstIdx = false;
+
    ifstream file(str);
    if (!file)
       throw string("Unable to open [") + str + "] file.";
@@ -34,17 +37,18 @@ LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theS
       size_t i = 0;
       bool more = false;
 
-      size_t theStationIdx = 0; // use to save last index
-
       if (!str.empty())
          more = true;
 
       // Count the amount of items 
-      size_t itemCount = std::count(str.begin(), str.end(), newStr.getDelimiter()) + 1;
-      Item* items = new Item[itemCount];
+      unsigned itemCount = std::count(str.begin(), str.end(), newStr.getDelimiter()) + 1;
 
-      for (i = 0; i < itemCount; i++)
-         items[i].m_itemName = newStr.extractToken(str, next_pos, more);
+      std::vector<string> items;
+
+      for (i = 0; i < itemCount; i++) {
+         string token = newStr.extractToken(str, next_pos, more);
+         items.push_back(token);
+      }
 
       auto station1_i = -1;              
       auto station2_i = -1;
@@ -53,38 +57,27 @@ LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theS
       for (auto itr = theStations.begin(); itr != theStations.end(); itr++, i++) {
          string name = theStations.at(i)->getItemName();
 
-        
-         if (station1_i == -1 && name == items[0].m_itemName) {
-            if (!firstIdx) {
-               firstIndex = i;
-               firstIdx = true;
-            }
+         if (station1_i == -1 && name == items.at(0)) {
             station1_i = i;
          }
-
-         if (station2_i == -1 && name == items[1].m_itemName) {
-            station2_i = i; // save index 
-
+         else if (itemCount > 1) {
+            if (station2_i == -1 && name == items.at(1)) {
+               station2_i = i; // save index
+            }
          }
-         
-         theStationIdx = i; // save index in order to save the last index
       }
       
       // Make station1 point to station2
       Workstation* station1 = theStations.at(station1_i);
 
-
       if (station2_i == -1) {
-         Workstation* emptyStation = new Workstation();
+         emptyStation = new Workstation();
          station1->setNextStation(*emptyStation);
-         lastIndex = theStationIdx - 1;
       }
       else {
          Workstation* station2 = theStations.at(station2_i);
          station1->setNextStation(*station2);
       }
-
-      delete[] items;
 
    }
    file.close();
@@ -110,19 +103,23 @@ bool LineManager::run(std::ostream& os) {
    size_t j = 0;
    Workstation* current = nullptr;
 
+   // Sort the stations
    for (i = 0; i < AssemblyLine.size(); i++) {
       current = AssemblyLine.at(i);
-      bool is_next = false;
+      bool isNext = false;
 
       for (j = 0; j < AssemblyLine.size(); j++) {
          Workstation* temp = AssemblyLine.at(j);
-         if (i != j && temp->getNextStation() && current->getItemName() == temp->getNextStation()->getItemName()) {
-            is_next = true;
+         if (i != j 
+            && temp->getNextStation() 
+            && current->getItemName() == temp->getNextStation()->getItemName()) {
+
+            isNext = true;
             break;
          }
       }
 
-      if (!is_next) {
+      if (!isNext) {
          break;
       }
    }
@@ -147,8 +144,7 @@ bool LineManager::run(std::ostream& os) {
             ok = false;
          }
          
-         i->moveOrder();
-               
+         i->moveOrder();   
       }
    }
 
@@ -174,17 +170,20 @@ void LineManager::displayStationsSorted()const {
 
    for (i = 0; i < AssemblyLine.size(); i++) {
       current = AssemblyLine.at(i);
-      bool is_next = false;
+      bool isNext = false;
 
       for (j = 0; j < AssemblyLine.size(); j++) {
          Workstation* temp = AssemblyLine.at(j);
-         if (i != j && temp->getNextStation() && current->getItemName() == temp->getNextStation()->getItemName()) {
-            is_next = true;
+         if (i != j 
+            && temp->getNextStation() 
+            && current->getItemName() == temp->getNextStation()->getItemName()) {
+
+            isNext = true;
             break;
          }
       }
       
-      if (!is_next) {
+      if (!isNext) {
          break;
       }
    }
