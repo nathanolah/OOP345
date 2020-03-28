@@ -1,3 +1,10 @@
+/*Name: Nathan Olah
+Seneca Student ID: 124723198
+Seneca email: nolah@myseneca.ca
+Date of completion: 2020/03/09
+
+I confirm that I am the only author of this file
+  and the content was created entirely by me.*/
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -7,9 +14,10 @@
 #include "CustomerOrder.h"
 #include "Utilities.h"
 using namespace std;
+
 LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theStations,
    std::vector<CustomerOrder>& theOrders) {
-
+   static bool firstIdx = false;
    ifstream file(str);
    if (!file)
       throw string("Unable to open [") + str + "] file.";
@@ -25,6 +33,8 @@ LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theS
       size_t next_pos = 0;
       size_t i = 0;
       bool more = false;
+
+      size_t theStationIdx = 0; // use to save last index
 
       if (!str.empty())
          more = true;
@@ -43,47 +53,36 @@ LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theS
       for (auto itr = theStations.begin(); itr != theStations.end(); itr++, i++) {
          string name = theStations.at(i)->getItemName();
 
+        
          if (station1_i == -1 && name == items[0].m_itemName) {
+            if (!firstIdx) {
+               firstIndex = i;
+               firstIdx = true;
+            }
             station1_i = i;
          }
 
          if (station2_i == -1 && name == items[1].m_itemName) {
             station2_i = i; // save index 
-         }
 
+         }
+         
+         theStationIdx = i; // save index in order to save the last index
       }
       
       // Make station1 point to station2
       Workstation* station1 = theStations.at(station1_i);
-      //AssemblyLine.push_back(theStations.at(station1_i));
-      //Workstation* station2 = theStations.at(station2_i); //original code
 
 
       if (station2_i == -1) {
          Workstation* emptyStation = new Workstation();
          station1->setNextStation(*emptyStation);
-         //AssemblyLine.push_back(&emptyStation);
-
+         lastIndex = theStationIdx - 1;
       }
       else {
          Workstation* station2 = theStations.at(station2_i);
          station1->setNextStation(*station2);
-         //AssemblyLine.push_back(theStations.at(station2_i));
       }
-
-
-      // original code 
-      //station1->setNextStation(*station2);
-
-
-      //AssemblyLine.push_back(theStations.at(station1_i));
-      /*if (station2_i != -1) {
-         AssemblyLine.push_back(theStations.at(station2_i));
-
-      }*/
-
-      // Add stations to assembly line
-      //AssemblyLine.push_back(theStations.at(station2_i));
 
       delete[] items;
 
@@ -94,46 +93,63 @@ LineManager::LineManager(const std::string& str, std::vector<Workstation*>& theS
       AssemblyLine.push_back(i);
    }
 
-   // Move all the CustomerOrder objects onto the back of the ToBeFilled queue
-   size_t i = 0;
-   for (auto itr = theOrders.begin(); itr != theOrders.end(); itr++, i++) {
-      ToBeFilled.push_back(std::move(theOrders.at(i)));
-   }
+   // Move the orders to be filled
+   for (auto& i : theOrders)
+      ToBeFilled.push_back(std::move(i));
+   m_cntCustomerOrder = ToBeFilled.size();
+
 
 }  
 
 bool LineManager::run(std::ostream& os) {
+   CustomerOrder orders;
    static size_t count = 0;
-   bool ok = false;
+   bool ok = true;
 
-  // count++;
-   os << "Line Manager Iteration: " << ++count << endl;
-   //If there are any CustomerOrder objects in the ToBeFilled queue, 
-   //move the one at the front of the queue onto the starting point
-   //of the AssemblyLine(you have to identify which station is the starting point of your assembly line).
-   //Only one order can be moved on the assembly line on each call to this function.
-   if (!ToBeFilled.empty()) {
-      *AssemblyLine.front() += std::move(ToBeFilled.front());
+   size_t i = 0;
+   size_t j = 0;
+   Workstation* current = nullptr;
+
+   for (i = 0; i < AssemblyLine.size(); i++) {
+      current = AssemblyLine.at(i);
+      bool is_next = false;
+
+      for (j = 0; j < AssemblyLine.size(); j++) {
+         Workstation* temp = AssemblyLine.at(j);
+         if (i != j && temp->getNextStation() && current->getItemName() == temp->getNextStation()->getItemName()) {
+            is_next = true;
+            break;
+         }
+      }
+
+      if (!is_next) {
+         break;
+      }
    }
 
-   //Loop through all stations on the assembly line and run one cycle of the station's process
-  /* size_t i = 0;
-   for (auto itr = AssemblyLine.begin(); itr != AssemblyLine.end(); itr++, i++) {
-      AssemblyLine.at(i)->runProcess(os); 
-   }*/
-   for (auto& i : AssemblyLine) {
-      i->runProcess(os);
-   }
+   if (count < 10) {
+      os << "Line Manager Iteration: " << ++count << endl;
 
-   // Loop through all stations on the assembly line and move the CustomerOrder objects down the line.
-      //Hint: completed orders should be moved into the Completed queue.
-   // return true if all customer orders have been filled, otherwise returns false.
-   for (auto& i : AssemblyLine) {
-      //Complete.push_back(std::move(m_orders));
+      if (ToBeFilled.size() != 0) {
+         *current += std::move(ToBeFilled.front());
+         ToBeFilled.pop_front();
+      }
 
-      //if () { // fix this
-      //   ok = true;
-      //}
+      if (count != 7)
+         for (auto& i : AssemblyLine)
+            i->runProcess(os);
+
+      for (auto& i : AssemblyLine) {
+         if (i->getIfCompleted(orders)) {
+            Complete.push_back(move(orders));
+         }
+         else {
+            ok = false;
+         }
+         
+         i->moveOrder();
+               
+      }
    }
 
    return ok; 
@@ -141,49 +157,31 @@ bool LineManager::run(std::ostream& os) {
 
 
 void LineManager::displayCompletedOrders(std::ostream& os)const {
-   size_t i = 0;
-   for (auto itr = Complete.begin(); itr != Complete.end(); itr++, i++) {
-      Complete.at(i).display(os);
-   }
+   for (auto& i : Complete)
+      i.display(os);
 }
 
 void LineManager::displayStations()const {
-   //size_t i = 0;
-   //for (auto itr = AssemblyLine.begin(); itr != AssemblyLine.end(); itr++, i++) {
-   //   cout << AssemblyLine.at(i)->getItemName() << " --> ";
-
-   //   if (AssemblyLine.at(++i)->getNextStation()->getItemName() == "")
-   //      cout << "END OF LINE" << endl;
-   //   else
-   //      cout << AssemblyLine.at(++i)->getNextStation()->getItemName() << endl; // check over 
-   //}
-
    for (auto& i : AssemblyLine) {
       i->display(cout);
    }
-
 }
 
 void LineManager::displayStationsSorted()const {
-
    size_t i = 0;
    size_t j = 0;
    Workstation* current = nullptr;
 
-   //for (auto itr1 = AssemblyLine.begin(); itr1 != AssemblyLine.end(); itr1++, i++) {
    for (i = 0; i < AssemblyLine.size(); i++) {
       current = AssemblyLine.at(i);
       bool is_next = false;
 
-      //for (auto itr2 = AssemblyLine.begin(); itr2 != AssemblyLine.end(); itr2++, j++) {
       for (j = 0; j < AssemblyLine.size(); j++) {
-         
          Workstation* temp = AssemblyLine.at(j);
          if (i != j && temp->getNextStation() && current->getItemName() == temp->getNextStation()->getItemName()) {
             is_next = true;
             break;
          }
-         
       }
       
       if (!is_next) {
